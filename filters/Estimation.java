@@ -326,9 +326,7 @@ public class Estimation {
 						}
 						
 						
-						System.out.print("error_NOcancel_KFSM="+error_0+"\n");
-						System.out.print("error_NOcancel_KFDT="+error_1+"\n");
-						System.out.print("error_NOcancel_KFST="+error_2+"\n");
+
 						System.out.print("error_avg_KFSM="+erroravg[0]+"\n");
 						System.out.print("error_avg_KFDT="+erroravg[1]+"\n");
 						System.out.print("error_avg_KFST="+erroravg[2]+"\n");
@@ -352,9 +350,7 @@ public class Estimation {
 				writerTrue.flush(); writerTrue.close();
 				writerRate.flush(); writerRate.close();
 				writerTrVar.flush(); writerTrVar.close();
-				System.out.print("rate_KFSM="+rate[0]+"\n");
-				System.out.print("rate_KFDT="+rate[1]+"\n");
-				System.out.print("rate_KFST="+rate[2]+"\n");
+
 			System.out.println(" End");			
 		}
 		catch (Exception e) {e.printStackTrace();}

@@ -31,6 +31,6 @@ public class Test {
 
 	    //setting adjacent sections
 
-	    Estimation.exportResult(groundtruth, 100, "SensorSchedule_1018_smdtst_absolute_fixKFSM_sdv_1_sdv_tb_100_test1168");
+	    Estimation.exportResult(groundtruth, 100, "kfsm");
 	}	
 }
