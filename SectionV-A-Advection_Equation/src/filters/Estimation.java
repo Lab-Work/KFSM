@@ -30,7 +30,7 @@ public class Estimation {
 	public static void exportResult(TargetGroundTruth _targetGroundTruth, int limite, String folder) {
 		try {
 			
-			int numAvg=100;
+			int numAvg=1;
 		    int numKFSM=numAvg;
 		    int numKFDT=numAvg;
 		    int numKFST=numAvg;
@@ -58,15 +58,15 @@ public class Estimation {
 			Triggerer []STtriggerST=new Triggerer [numKFST];
 			for(int i=0; i<numKFSM;i++){
 				DTtriggerSM[i]=Triggerer.createTriggerer("DT");
-				DTtriggerSM[i].setNewParameters(DoubleMatrix.eye(1).mul(10),0.7);
+				DTtriggerSM[i].setNewParameters(DoubleMatrix.eye(1).mul(0.5),0.45);
 			}
 			for(int i=0; i<numKFDT;i++){
 				DTtriggerDT[i]=Triggerer.createTriggerer("DT");
-				DTtriggerDT[i].setNewParameters(DoubleMatrix.eye(1).mul(200000), 0.6);
+				DTtriggerDT[i].setNewParameters(DoubleMatrix.eye(1).mul(0.5), 0.45);
 			}
 			for(int i=0; i<numKFST;i++){
 				STtriggerST[i]=Triggerer.createTriggerer("ST");
-				STtriggerST[i].setNewParameters(DoubleMatrix.eye(1).mul(10000000), 0.31);
+				STtriggerST[i].setNewParameters(DoubleMatrix.eye(1).mul(0.5), 0.45);
 			}
 						
 			System.out.print("Beginning of simulation");
@@ -121,6 +121,7 @@ public class Estimation {
 					}
 
 					for (int i=0; i<3; i++) {
+						writerError[i].write((k+1)+",");
 						errorSDVk[i]=0;
 						if (i==0){
 							double trace=0;
@@ -275,9 +276,12 @@ public class Estimation {
 													
 					for (int i=0; i<numFilters; i++) {
 						estimations[i].filter.getNewParametersFromModel();
-					}			
+					}
+					
+					double inflow=0.01+0.01*Math.sin(k*(Math.PI/4000)+(Math.PI));
+//					double inflow=0.5;
 				
-					_targetGroundTruth.update();			
+					_targetGroundTruth.update(inflow);			
 
 					for(int i=0; i<numFilters; i++){
 						trueSolution[i].update();
@@ -326,7 +330,9 @@ public class Estimation {
 						}
 						
 						
-
+						System.out.print("error_NOcancel_KFSM="+error_0+"\n");
+						System.out.print("error_NOcancel_KFDT="+error_1+"\n");
+						System.out.print("error_NOcancel_KFST="+error_2+"\n");
 						System.out.print("error_avg_KFSM="+erroravg[0]+"\n");
 						System.out.print("error_avg_KFDT="+erroravg[1]+"\n");
 						System.out.print("error_avg_KFST="+erroravg[2]+"\n");
@@ -350,7 +356,9 @@ public class Estimation {
 				writerTrue.flush(); writerTrue.close();
 				writerRate.flush(); writerRate.close();
 				writerTrVar.flush(); writerTrVar.close();
-
+				System.out.print("rate_KFSM="+rate[0]+"\n");
+				System.out.print("rate_KFDT="+rate[1]+"\n");
+				System.out.print("rate_KFST="+rate[2]+"\n");
 			System.out.println(" End");			
 		}
 		catch (Exception e) {e.printStackTrace();}

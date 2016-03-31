@@ -71,14 +71,19 @@ public abstract class ModelKF {
  		
  		//**start setting initial mean and var
 		DoubleMatrix initialGuess=DoubleMatrix.zeros(cells, 1);
-		initialGuess.put(0,0,10);
-		initialGuess.put(1,0,1.05);	
-		initialVar=DoubleMatrix.eye(cells).mul(100);
+		
+		double slope = (trueSolution.trueStates.get(cells-1,0) - trueSolution.trueStates.get(0,0)+0.5) / ((double)cells); 
+		for(int i=0; i<cells; i++) {
+			initialGuess.put(i,trueSolution.trueStates.get(0,0)+0.25 + i*slope);
+		}
+
+		initialVar=DoubleMatrix.eye(cells).mul(0.0081);
 		
 		initialGenerator = new GaussianGenerator(initialVar.mul(1));
 		DoubleMatrix noiseInitial = initialGenerator.sample();
 		
-		initialMean=initialGuess.add(noiseInitial);
+//		initialMean=initialGuess.add(noiseInitial);
+		initialMean=initialGuess;
 		
 		//**end setting initial mean and var
 		

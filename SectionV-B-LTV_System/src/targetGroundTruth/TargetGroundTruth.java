@@ -15,6 +15,8 @@ public abstract class TargetGroundTruth {
 	public int numUp;
 	
 	public DoubleMatrix AMatrix;
+	public DoubleMatrix AMatrix1;
+	public DoubleMatrix AMatrix2;
 	public DoubleMatrix QMatrix;
 		
 	abstract public void propagateGround();
@@ -32,10 +34,18 @@ public abstract class TargetGroundTruth {
 	    trueStatesGroundPrior=trueStatesGround.dup();
 	    
 	    //**Start setting A Matrix
-	    AMatrix=DoubleMatrix.zeros(cells,cells);
-	    AMatrix.put(0,0,1.05);
-	    AMatrix.put(1,0,0.1);
-	    AMatrix.put(1,1,0.9);
+	    
+	    AMatrix1=DoubleMatrix.zeros(cells,cells);
+	    AMatrix1.put(0,0,1.05);
+	    AMatrix1.put(1,0,0.1);
+	    AMatrix1.put(1,1,0.9);
+	    
+	    AMatrix2=DoubleMatrix.zeros(cells,cells);
+	    AMatrix2.put(0,0,1.05);
+	    AMatrix2.put(1,0,0.2);
+	    AMatrix2.put(1,1,0.8);
+	    
+	    AMatrix=AMatrix1.dup();
 	    //**End setting A Matrix
 	    
 	    QMatrix=DoubleMatrix.zeros(cells,cells);
