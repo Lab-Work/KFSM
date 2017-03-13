@@ -30,7 +30,7 @@ public class Estimation {
 	public static void exportResult(TargetGroundTruth _targetGroundTruth, int limite, String folder) {
 		try {
 			
-			int numAvg=1;
+			int numAvg=500;
 		    int numKFSM=numAvg;
 		    int numKFDT=numAvg;
 		    int numKFST=numAvg;
@@ -52,17 +52,18 @@ public class Estimation {
 			BufferedWriter writerTrVar;
 			BufferedWriter[] writerFilter = new BufferedWriter[3];
 			BufferedWriter[] writerError= new BufferedWriter[3];
+			BufferedWriter[] writerEst = new BufferedWriter[3];
 			
 			Triggerer []DTtriggerSM=new Triggerer [numKFSM];
 			Triggerer []DTtriggerDT=new Triggerer [numKFDT];
 			Triggerer []STtriggerST=new Triggerer [numKFST];
 			for(int i=0; i<numKFSM;i++){
 				DTtriggerSM[i]=Triggerer.createTriggerer("DT");
-				DTtriggerSM[i].setNewParameters(DoubleMatrix.eye(1).mul(10),0.85);
+				DTtriggerSM[i].setNewParameters(DoubleMatrix.eye(1).mul(10),0.6);
 			}
 			for(int i=0; i<numKFDT;i++){
 				DTtriggerDT[i]=Triggerer.createTriggerer("DT");
-				DTtriggerDT[i].setNewParameters(DoubleMatrix.eye(1).mul(200000), 0.85);
+				DTtriggerDT[i].setNewParameters(DoubleMatrix.eye(1).mul(200000), 0.6);
 			}
 			for(int i=0; i<numKFST;i++){
 				STtriggerST[i]=Triggerer.createTriggerer("ST");
@@ -81,6 +82,8 @@ public class Estimation {
 				double [] errorSDV_avg =new double [3];
 				double [] errorSDVk =new double [3];
 				double [] errorplusSDV =new double [3];
+				double [] errorplusnSDV =new double [3];
+				double [] error2plusSDV =new double [3];
 				int kinitial=0;
 				
 				writerTrue = new BufferedWriter(new FileWriter(new File("results/"+folder+"/"+"trueState.csv")));
@@ -104,7 +107,9 @@ public class Estimation {
 					
 					String S = "results/"+folder+"/"+estimations[i*numAvg].filter.getClass().getSimpleName();
 					writerFilter[i] = new BufferedWriter(new FileWriter(new File(S+".csv")));
-					writerError[i]=new BufferedWriter(new FileWriter(new File(S+"error.csv")));		
+					writerError[i]=new BufferedWriter(new FileWriter(new File(S+"error.csv")));	
+					writerEst[i]=new BufferedWriter(new FileWriter(new File(S+"error_r.csv")));	
+			
 				}     
 				
 				for (int k=0; k<limite; k++) {
@@ -178,7 +183,28 @@ public class Estimation {
 							writerError[i].write(mean[i].get(j)-_targetGroundTruth.trueStatesGround.get(j)+",");						
 						}
     					writerError[i].write(Math.sqrt((((mean[i].sub(_targetGroundTruth.trueStatesGround)).transpose()).mmul(mean[i].sub(_targetGroundTruth.trueStatesGround))).get(0,0))+",");
-    					writerError[i].write(errorSDVk[i]+",");
+    					writerError[i].write(mean[i].sub(_targetGroundTruth.trueStatesGround).get(0)+",");
+    					if (k==limite-1){
+        					for (int j=0;j<numAvg;j++){
+        						if(i==0){
+            						writerEst[i].write((estimations[j].filter.mean.sub(_targetGroundTruth.trueStatesGround)).get(0)+",");  						
+            						writerEst[i].write((estimations[j].filter.mean.sub(_targetGroundTruth.trueStatesGround)).get(1)+",");
+        						}
+        						else if (i==1){
+        							writerEst[i].write((estimations[j+numKFSM].filter.mean.sub(_targetGroundTruth.trueStatesGround)).get(0)+",");
+        							
+            						writerEst[i].write((estimations[j+numKFSM].filter.mean.sub(_targetGroundTruth.trueStatesGround)).get(1)+",");
+        						}
+        						else{
+        							writerEst[i].write((estimations[j+numKFSM+numKFDT].filter.mean.sub(_targetGroundTruth.trueStatesGround)).get(0)+",");
+        							
+            						writerEst[i].write((estimations[j+numKFSM+numKFDT].filter.mean.sub(_targetGroundTruth.trueStatesGround)).get(1)+",");
+        						}
+        						writerEst[i].write("\n");
+        					}
+        					
+    					}
+
 
 						writerError[i].write("\n");
 						writerFilter[i].write("\n");
@@ -196,7 +222,7 @@ public class Estimation {
 
 						for (int i=0; i<numFilters; i++) {
 		
-							error1[i]=error1[i]+(Math.sqrt((((estimations[i].filter.mean.sub(_targetGroundTruth.trueStatesGround)).transpose()).mmul(estimations[i].filter.mean.sub(_targetGroundTruth.trueStatesGround))).get(0,0)))/((double)(limite-kinitial));
+							error1[i]=error1[i]+(((((estimations[i].filter.mean.sub(_targetGroundTruth.trueStatesGround)).transpose()).mmul(estimations[i].filter.mean.sub(_targetGroundTruth.trueStatesGround))).get(0,0)))/((double)(limite-kinitial));
 							 
 							
 						}
@@ -323,9 +349,13 @@ public class Estimation {
 								errorSDV_avg[i]=errorSDV_avg[i]+(errorSDV[i][k1]/(double)(limite-kinitial));
 							}
 							
+							errorplusnSDV[i]=erroravg[i]+(1/Math.sqrt(numAvg))*errorSDV_avg[i];
 							errorplusSDV[i]=erroravg[i]+errorSDV_avg[i];
 						}
 						
+						for (int i=0;i<3;i++){
+							error2plusSDV[i]=erroravg[i]*erroravg[i]+errorSDV_avg[i];
+						}
 						
 						System.out.print("error_NOcancel_KFSM="+error_0+"\n");
 						System.out.print("error_NOcancel_KFDT="+error_1+"\n");
@@ -336,9 +366,15 @@ public class Estimation {
 						System.out.print("error_SDV_KFSM="+errorSDV_avg[0]+"\n");
 						System.out.print("error_SDV_KFDT="+errorSDV_avg[1]+"\n");
 						System.out.print("error_SDV_KFST="+errorSDV_avg[2]+"\n");
+						System.out.print("error2_plus_SDV_KFSM="+error2plusSDV[0]+"\n");
+						System.out.print("error2_plus_SDV_KFDT="+error2plusSDV[1]+"\n");
+						System.out.print("error2_plus_SDV_KFST="+error2plusSDV[2]+"\n");
 						System.out.print("error_plus_SDV_KFSM="+errorplusSDV[0]+"\n");
 						System.out.print("error_plus_SDV_KFDT="+errorplusSDV[1]+"\n");
 						System.out.print("error_plus_SDV_KFST="+errorplusSDV[2]+"\n");
+						System.out.print("error_plus_normalizedSDV_KFSM="+errorplusnSDV[0]+"\n");
+						System.out.print("error_plus_normalizedSDV_KFDT="+errorplusnSDV[1]+"\n");
+						System.out.print("error_plus_normalizedSDV_KFST="+errorplusnSDV[2]+"\n");
 						writerRate.write("rate_KFSM="+rate[0]+"\n");
 						writerRate.write("rate_KFDT="+rate[1]+"\n");
 						writerRate.write("rate_KFST="+rate[2]+"\n");
@@ -348,6 +384,7 @@ public class Estimation {
 				for (int i = 0; i<3; i++) {
 					writerFilter[i].flush(); writerFilter[i].close();
 					writerError[i].flush(); writerError[i].close();
+					writerEst[i].flush(); writerEst[i].close();
 				}
 
 				writerTrue.flush(); writerTrue.close();

@@ -49,10 +49,10 @@ public abstract class TargetGroundTruth {
 	    //**End setting A Matrix
 	    
 	    QMatrix=DoubleMatrix.zeros(cells,cells);
-	    QMatrix.put(0,0,1);
-	    QMatrix.put(1,0,2);
-	    QMatrix.put(0,1,2);
-	    QMatrix.put(1,1,9);
+	    QMatrix.put(0,0,9);
+	    QMatrix.put(1,0,16);
+	    QMatrix.put(0,1,16);
+	    QMatrix.put(1,1,36);
 	    		
 		numUp = 0;
 	}

@@ -31,7 +31,7 @@ public class Test {
 
 	    //setting adjacent sections
 
-	    Estimation.exportResult(groundtruth, 100, "SensorSchedule_1201_ltv");
+	    Estimation.exportResult(groundtruth, 100, "SensorSchedule_1018_ltv_3_500-step1");
 	    
 
 	}	

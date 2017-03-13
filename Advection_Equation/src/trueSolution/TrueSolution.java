@@ -48,7 +48,7 @@ public abstract class TrueSolution {
 		//**measurement error covariance matrix, which is larger than the true measurement error 
 		//to ensure satisfactory performance of the filter
 		measureVarDensity = DoubleMatrix.eye(sizeMeasurements).mul(1);
-		measureGeneratorDensity = new GaussianGenerator(measureVarDensity.mul(0.01));
+		measureGeneratorDensity = new GaussianGenerator(measureVarDensity.mul(1));
 
 		trueStates=DoubleMatrix.zeros(cells,1);
 		currenttrueStates=trueStates.dup();

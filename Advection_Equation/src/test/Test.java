@@ -31,6 +31,6 @@ public class Test {
 
 	    //setting adjacent sections
 
-	    Estimation.exportResult(groundtruth, 2000, "SensorSchedule_advection_equation");
+	    Estimation.exportResult(groundtruth, 2000, "SensorSchedule_1018-sg-correlation-6-cfl1");
 	}	
 }

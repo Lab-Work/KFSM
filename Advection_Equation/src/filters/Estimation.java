@@ -30,7 +30,7 @@ public class Estimation {
 	public static void exportResult(TargetGroundTruth _targetGroundTruth, int limite, String folder) {
 		try {
 			
-			int numAvg=1;
+			int numAvg=100;
 		    int numKFSM=numAvg;
 		    int numKFDT=numAvg;
 		    int numKFST=numAvg;
@@ -58,15 +58,15 @@ public class Estimation {
 			Triggerer []STtriggerST=new Triggerer [numKFST];
 			for(int i=0; i<numKFSM;i++){
 				DTtriggerSM[i]=Triggerer.createTriggerer("DT");
-				DTtriggerSM[i].setNewParameters(DoubleMatrix.eye(1).mul(0.5),0.45);
+				DTtriggerSM[i].setNewParameters(DoubleMatrix.eye(1).mul(10),1);
 			}
 			for(int i=0; i<numKFDT;i++){
 				DTtriggerDT[i]=Triggerer.createTriggerer("DT");
-				DTtriggerDT[i].setNewParameters(DoubleMatrix.eye(1).mul(0.5), 0.45);
+				DTtriggerDT[i].setNewParameters(DoubleMatrix.eye(1).mul(200000), 1);
 			}
 			for(int i=0; i<numKFST;i++){
 				STtriggerST[i]=Triggerer.createTriggerer("ST");
-				STtriggerST[i].setNewParameters(DoubleMatrix.eye(1).mul(0.5), 0.45);
+				STtriggerST[i].setNewParameters(DoubleMatrix.eye(1).mul(3), 0.31);
 			}
 						
 			System.out.print("Beginning of simulation");
@@ -81,6 +81,7 @@ public class Estimation {
 				double [] errorSDV_avg =new double [3];
 				double [] errorSDVk =new double [3];
 				double [] errorplusSDV =new double [3];
+				double [] errorplusnSDV =new double [3];
 				int kinitial=30;
 				
 				writerTrue = new BufferedWriter(new FileWriter(new File("results/"+folder+"/"+"trueState.csv")));
@@ -327,6 +328,7 @@ public class Estimation {
 							}
 							
 							errorplusSDV[i]=erroravg[i]+errorSDV_avg[i];
+							errorplusnSDV[i]=erroravg[i]+(1/Math.sqrt(numAvg))*errorSDV_avg[i];
 						}
 						
 						
@@ -339,9 +341,13 @@ public class Estimation {
 						System.out.print("error_SDV_KFSM="+errorSDV_avg[0]+"\n");
 						System.out.print("error_SDV_KFDT="+errorSDV_avg[1]+"\n");
 						System.out.print("error_SDV_KFST="+errorSDV_avg[2]+"\n");
+						
 						System.out.print("error_plus_SDV_KFSM="+errorplusSDV[0]+"\n");
 						System.out.print("error_plus_SDV_KFDT="+errorplusSDV[1]+"\n");
 						System.out.print("error_plus_SDV_KFST="+errorplusSDV[2]+"\n");
+						System.out.print("error_plus_normalizedSDV_KFSM="+errorplusnSDV[0]+"\n");
+						System.out.print("error_plus_normalizedSDV_KFDT="+errorplusnSDV[1]+"\n");
+						System.out.print("error_plus_normalizedSDV_KFST="+errorplusnSDV[2]+"\n");
 						writerRate.write("rate_KFSM="+rate[0]+"\n");
 						writerRate.write("rate_KFDT="+rate[1]+"\n");
 						writerRate.write("rate_KFST="+rate[2]+"\n");
